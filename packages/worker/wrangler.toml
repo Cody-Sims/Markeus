@@ -15,7 +15,7 @@ database_id = "1a5e6e83-cc6e-4300-8ec7-a181292347a4"
 # id = "placeholder-replace-after-creation"
 
 [vars]
-ALLOWED_ORIGIN = "https://codythecoder.github.io"
+ALLOWED_ORIGIN = "https:/https://cody-sims.github.io/"
 # Optional: set via `wrangler secret put FINNHUB_API_KEY` for real-time quotes
 # If not set, all data comes from Yahoo Finance (no API key needed)
 
