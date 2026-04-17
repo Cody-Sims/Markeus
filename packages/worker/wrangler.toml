@@ -1,0 +1,20 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "markeus-api"
+main = "src/index.ts"
+compatibility_date = "2025-04-14"
+
+# D1 database for caching market data
+[[d1_databases]]
+binding = "DB"
+database_name = "markeus-cache"
+database_id = "1a5e6e83-cc6e-4300-8ec7-a181292347a4"
+
+# KV namespace for lightweight caching (quotes, metadata)
+# [[kv_namespaces]]
+# binding = "KV"
+# id = "placeholder-replace-after-creation"
+
+[vars]
+ALLOWED_ORIGIN = "https://codythecoder.github.io"
+# Optional: set via `wrangler secret put FINNHUB_API_KEY` for real-time quotes
+# If not set, all data comes from Yahoo Finance (no API key needed)
