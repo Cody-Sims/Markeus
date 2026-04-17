@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:migrate:local": "wrangler d1 migrations apply markeus-cache --local",
+    "db:migrate:prod": "wrangler d1 migrations apply markeus-cache --remote"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250416.0",
