@@ -152,6 +152,72 @@ export async function fetchStockHistory(
   return candles
 }
 
+// Incremental fetch: only get candles from a specific date forward
+export async function fetchStockHistorySince(
+  symbol: string,
+  fromDate: string,
+  toDate?: string
+): Promise<StockCandle[]> {
+  // period1 = day after fromDate to avoid re-fetching the last known day
+  const from = new Date(fromDate)
+  from.setDate(from.getDate() + 1)
+  const period1 = Math.floor(from.getTime() / 1000)
+
+  const to = toDate ? new Date(toDate) : new Date()
+  to.setHours(23, 59, 59)
+  const period2 = Math.floor(to.getTime() / 1000)
+
+  if (period1 >= period2) return [] // already up to date
+
+  const url = `${YAHOO_BASE}/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${period1}&period2=${period2}&interval=1d&includePrePost=false`
+
+  const resp = await fetch(url, {
+    headers: { 'User-Agent': USER_AGENT },
+  })
+
+  if (!resp.ok) {
+    throw new Error(`Yahoo Finance returned ${resp.status} for ${symbol}`)
+  }
+
+  const data = (await resp.json()) as YahooChartResult
+
+  if (data.chart.error) {
+    throw new Error(data.chart.error.description)
+  }
+
+  const result = data.chart.result[0]
+  if (!result || !result.timestamp || result.timestamp.length === 0) {
+    return [] // no new data
+  }
+
+  const { timestamp, indicators } = result
+  const quote = indicators.quote[0]
+  const adjclose = indicators.adjclose?.[0]?.adjclose
+
+  const candles: StockCandle[] = []
+
+  for (let i = 0; i < timestamp.length; i++) {
+    if (quote.open[i] == null || quote.close[i] == null) continue
+
+    const date = new Date(timestamp[i] * 1000)
+    const dateStr = date.toISOString().split('T')[0]
+
+    // Extra guard: skip if somehow <= fromDate
+    if (dateStr <= fromDate) continue
+
+    candles.push({
+      date: dateStr,
+      open: round(quote.open[i]),
+      high: round(quote.high[i]),
+      low: round(quote.low[i]),
+      close: round(adjclose ? adjclose[i] : quote.close[i]),
+      volume: Math.round(quote.volume[i]),
+    })
+  }
+
+  return candles
+}
+
 export async function fetchQuote(symbol: string): Promise<StockQuote> {
   const url = `${YAHOO_BASE}/v8/finance/chart/${encodeURIComponent(symbol)}?range=1d&interval=1d`
 

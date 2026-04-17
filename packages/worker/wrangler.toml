@@ -18,3 +18,7 @@ database_id = "1a5e6e83-cc6e-4300-8ec7-a181292347a4"
 ALLOWED_ORIGIN = "https://codythecoder.github.io"
 # Optional: set via `wrangler secret put FINNHUB_API_KEY` for real-time quotes
 # If not set, all data comes from Yahoo Finance (no API key needed)
+
+# Daily sync cron: 9:05 PM UTC (5:05 PM ET), weekdays only
+[triggers]
+crons = ["5 21 * * 1-5"]
