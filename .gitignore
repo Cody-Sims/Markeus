@@ -3,6 +3,9 @@ dist
 .DS_Store
 *.local
 
+# Local data (imported into D1)
+data/
+
 # Secrets / env files
 .env
 .env.*
